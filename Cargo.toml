@@ -11,5 +11,5 @@ path = "src/main.rs"
 clap_complete = "4.0.0"
 clap = {version = "4.0.0", features = ["derive"]}
 spdlog-rs = "0.4"
-tokio = { version = "1.37", features = ["full"] }
-duct = "0.13.7"
+tokio = { version = "1.0", features = ["full", "process", "sync", "io-util"] }
+prettytable = "0.10.0"

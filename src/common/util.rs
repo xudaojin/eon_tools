@@ -1,28 +1,44 @@
-use spdlog::error;
-use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio;
+use tokio::process::{Command, Child};
+use tokio::io::{AsyncBufReadExt, BufReader, Lines};
+use std::process::Stdio;
 
-pub async fn run_cmd_sync(cmd: &str, args: &[&str]) -> std::io::Result<String> {
-    let mut child = tokio::process::Command::new(cmd)
-        .args(args)
-        .stdout(std::process::Stdio::piped())
-        .stderr(std::process::Stdio::inherit()) // stderr 直接输出
-        .spawn()?;
+// mpstat 的结构体
+#[derive(Debug)]
+pub struct PidStatBuffer {
+    pub timestamp: String,
+    pub command: String,
+    pub pid: i32,
+    pub cpu: f32,   // 单位: 百分比
+    pub mem: f32,   // 单位: 百分比
+}
 
-    let stdout = child.stdout.take().expect("Failed to capture stdout");
-    let reader = BufReader::new(stdout);
-    let mut lines = reader.lines();
+pub struct CmdOutput {
+    lines: Lines<BufReader<tokio::process::ChildStdout>>,
+    child: Child,
+}
 
-    let mut output = String::new();
-
-    while let Some(line) = lines.next_line().await? {
-        println!("{}", line); // 实时打印
-        output.push_str(&line);
-        output.push('\n');
+impl CmdOutput {
+    pub async fn next_line(&mut self) -> std::io::Result<Option<String>> {
+        self.lines.next_line().await
     }
 
-    let status = child.wait().await?;
-    error!("Command exited with: {}", status);
+    pub async fn wait(&mut self) -> std::io::Result<()> {
+        self.child.wait().await.map(|_| ())
+    }
+}
 
-    Ok(output)
+pub async fn run_cmd_async(cmd: &str, args: &[&str]) -> std::io::Result<CmdOutput> {
+    let mut command = Command::new(cmd);
+    command.args(args);
+    command.stdout(Stdio::piped());
+
+    let mut child = command.spawn()?;
+    let stdout = child.stdout.take().expect("no stdout");
+
+    let reader = BufReader::new(stdout).lines();
+
+    Ok(CmdOutput {
+        lines: reader,
+        child,
+    })
 }

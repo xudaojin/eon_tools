@@ -1,6 +1,7 @@
 mod cli;
 mod sub_commands;
 mod common;
+mod commands;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

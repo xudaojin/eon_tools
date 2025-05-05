@@ -33,5 +33,7 @@ pub fn generate_completion(mut app: clap::Command, shell_type: Shell) -> io::Res
     let mut file = File::create(&file_path)?;
     let app_name = app.get_name().to_string();
     generate(shell_type, &mut app, app_name, &mut file);
+    info!("Create Successful");
+    info!("file path: [{:?}]", file_path);
     Ok(())
 }

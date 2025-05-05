@@ -1,17 +1,16 @@
-use crate::cli;
-
-pub fn run(sub_cmds: &cli::DeploySubCmds) {
-    match sub_cmds { 
-        cli::DeploySubCmds::Ros1 {code} => {
+use crate::commands;
+pub fn run(sub_cmds: &commands::DeploySubCmds) {
+    match sub_cmds {
+        commands::DeploySubCmds::Ros1 {code} => {
             ros1_install(code);
         }
-        cli::DeploySubCmds::Ros2 {code} => {
+        commands::DeploySubCmds::Ros2 {code} => {
             ros2_install(code);
         }
-        cli::DeploySubCmds::Docker {} => {
+        commands::DeploySubCmds::Docker {} => {
             docker_install();
         }
-        cli::DeploySubCmds::Dep {} => {
+        commands::DeploySubCmds::Dep {} => {
             dep_install();
         }
     }
