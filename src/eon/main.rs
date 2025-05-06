@@ -1,8 +1,6 @@
 mod cli;
-mod sub_commands;
-mod common;
 mod commands;
-
+pub mod sub_commands;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let app = cli::Eon::new();

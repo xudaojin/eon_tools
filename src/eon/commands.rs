@@ -1,5 +1,4 @@
 use clap::Parser;
-
 #[derive(Parser)]
 pub enum AutocompletionSubCmds {
     #[command(about = "创建 Bash 补全功能")]
@@ -59,7 +58,10 @@ pub enum MpstatSubCmds {
     #[command(about = "mpstat data record")]
     Record {
         #[arg(long, short, default_value_t = 1, help = "采样周期，默认1s")]
-        interval: i8
+        interval: i8,
+        
+        #[arg(long, short, default_value_t = String::from("mpstat.log"), help = "输出路径")]
+        output: String,
     }
 }
 
